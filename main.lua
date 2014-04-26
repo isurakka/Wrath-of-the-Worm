@@ -4,30 +4,57 @@ require("playerworm")
 require("ground")
 require("food")
 require("human")
+require("house")
 
 gameobjs = { }
 foods = { }
 humans = { }
+houses = { }
 playerObj = nil
 groundObj = nil
 
 function love.load()
 	math.randomseed(os.time())
 
+	-- create ground
 	groundObj = ground(vec2(2000, 400))
 	table.insert(gameobjs, groundObj)
 
+	-- generate houses
+	local houseGen = vec2(-900, 0)
+	while true do
+		local houseSize = vec2(
+			math.random(80, 200),
+			math.random(80, 400))
+		local margin = math.random(0, 3)
+		local houseObj = house(
+			vec2(houseGen.x + houseSize.x / 2, 0), 
+			vec2(houseSize.x, houseSize.y))
+
+		table.insert(houses, houseObj)
+		table.insert(gameobjs, houseObj)
+
+		houseGen.x = houseGen.x + houseSize.x + margin * 20
+
+		if (houseGen.x > 750) then
+			break
+		end
+	end
+
+	-- generate humans
 	for i=1, 50 do
 		local humanObj = human(vec2(math.random(-500, 500)), 1000)
 		table.insert(humans, humanObj)
 		table.insert(gameobjs, humanObj)
 	end
 
+	-- create player
 	playerObj = playerworm(vec2(0, 200))
 	table.insert(gameobjs, playerObj)
 
+	-- set food creation hook
 	playerObj.base.onPointAdd = function(point)
-		groundObj:addPoint(point, playerObj.base.radius)
+		groundObj:addPoint(point, playerObj.base.radius + 2)
 	end
 end
 
