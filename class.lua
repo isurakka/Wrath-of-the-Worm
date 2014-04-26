@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2010 Bart van Strien
+Copyright (c) 2009 Bart van Strien
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -28,9 +28,6 @@ __HAS_SECS_COMPATIBLE_CLASSES__ = true
 local class_mt = {}
 
 function class_mt:__index(key)
-    if key == "__private" or (rawget(self, "__private") and self.__private[key]) then
-        return nil
-    end
     if rawget(self, "__baseclass") then
         return self.__baseclass[key]
     end
@@ -92,18 +89,10 @@ function class:new(...)
     local c = {}
     c.__baseclass = self
     setmetatable(c, getmetatable(self))
-    c:__init(...)
+    if c.init then
+        c:init(...)
+    end
     return c
-end
-
-function class:__init(...)
-    local args = {...}
-    if rawget(self, "init") then
-        args = {self:init(...) or ...}
-    end
-    if self.__baseclass.__init then
-        self.__baseclass:__init(unpack(args))
-    end
 end
 
 function class:convert(t)

@@ -1,13 +1,20 @@
 require("worm")
+require("utils")
 
 gameobjs = { }
+playerworm = nil
 
 function love.load()
-	table.insert(gameobjs, worm())
+	playerworm = worm()
+	table.insert(gameobjs, playerworm)
 end
 
 function love.draw()
-    love.graphics.print("test", 400, 300)
+	love.graphics.translate(
+		love.graphics.getWidth() / 2, 
+		love.graphics.getHeight() / 2)
+
+    love.graphics.print("test", 0, 0)
 
     for k, v in pairs(gameobjs) do
 		v:draw()
@@ -19,7 +26,7 @@ acc = 0
 function love.update(dt)
 	-- tick
 	acc = acc + dt
-	if acc >= step then
+	while acc >= step do
 		acc = acc - step
 		for k, v in pairs(gameobjs) do
 			v:tick(step)
@@ -30,4 +37,6 @@ function love.update(dt)
 	for k, v in pairs(gameobjs) do
 		v:update(dt)
 	end
+
+	--print(table.tostring(playerworm.pieces))
 end
