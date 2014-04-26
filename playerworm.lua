@@ -1,9 +1,11 @@
 require("worm")
 
-playerworm = worm()
+base = worm()
+playerworm = gameobj()
 
+local oldInit = playerworm.init
 function playerworm:init()
-	self.__baseclass:init()
+	base:init()
 end
 
 function playerworm:tick(step)
@@ -15,11 +17,11 @@ function playerworm:tick(step)
 		rot = rot + 1
 	end
 
-	self.__baseclass.dir = self.dir:rotateDegrees(rot * self.rotationSpeed * step):normalized();
+	base.dir = base.dir:rotateDegrees(rot * base.rotationSpeed * step):normalized();
 
-	self.__baseclass:tick(step)
+	base:tick(step)
 end
 
 function playerworm:draw()
-	self.__baseclass:draw()
+	base:draw()
 end

@@ -1,12 +1,14 @@
-require("worm")
-require("playerworm")
 require("utils")
+
+require("playerworm")
+require("ground")
 
 gameobjs = { }
 player = nil
 
 function love.load()
 	player = playerworm()
+	table.insert(gameobjs, ground(vec2(1000, 600)))
 	table.insert(gameobjs, player)
 end
 
