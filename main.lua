@@ -1,12 +1,13 @@
 require("worm")
+require("playerworm")
 require("utils")
 
 gameobjs = { }
-playerworm = nil
+player = nil
 
 function love.load()
-	playerworm = worm()
-	table.insert(gameobjs, playerworm)
+	player = playerworm()
+	table.insert(gameobjs, player)
 end
 
 function love.draw()

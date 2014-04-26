@@ -7,8 +7,9 @@ function worm:init()
 	self.pieces = { vec2() }
 	self.dir = vec2(1, 0)
 	self.length = 100
-	self.speed = 200
-	self.radius = 16;
+	self.speed = 160
+	self.radius = 12;
+	self.rotationSpeed = 300
 end
 
 function worm:update(dt)
@@ -16,8 +17,6 @@ function worm:update(dt)
 end
 
 function worm:tick(step)
-	self.dir = self.dir:rotateDegrees(100 * step):normalized();
-
 	local last = self.pieces[1]
 	local new = last:add(vec2(
 		self.dir.x * self.speed * step, 
@@ -27,9 +26,9 @@ function worm:tick(step)
 end
 
 function worm:draw()
-	local i = 0
+	love.graphics.setColor(211, 84, 0, 255)
+
 	for k, v in pairs(self.pieces) do
 		love.graphics.circle("fill", v.x, v.y, self.radius, self.radius)
-		i = i + 1
 	end
 end

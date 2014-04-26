@@ -35,6 +35,10 @@ function vec2:rotateRadians(angle)
 end
 
 function vec2:normalized()
-	local len = math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
+	local len = self:length()
     return vec2(self.x / len, self.y / len);
+end
+
+function vec2:length()
+	return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
 end
