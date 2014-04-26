@@ -9,8 +9,7 @@ function ground:init(size)
 end
 
 function ground:draw()
-	--local darkAdd = -60
-	love.graphics.setColor(76, 30, 0, 255)
+	love.graphics.setColor(104, 58, 32, 255)
 
 	love.graphics.rectangle(
 		"fill", 

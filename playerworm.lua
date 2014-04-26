@@ -9,16 +9,18 @@ function playerworm:init()
 end
 
 function playerworm:tick(step)
-	local rot = 0
-	if (love.keyboard.isDown("left")) then
-		rot = rot - 1
-	end
-	if (love.keyboard.isDown("right")) then
-		rot = rot + 1
-	end
 
-	base.dir = base.dir:rotateDegrees(rot * base.rotationSpeed * step):normalized();
+	if (not base:isOverGround()) then
+		local rot = 0
+		if (love.keyboard.isDown("left")) then
+			rot = rot - 1
+		end
+		if (love.keyboard.isDown("right")) then
+			rot = rot + 1
+		end
 
+		base.dir = base.dir:rotateDegrees(rot * base.rotationSpeed * step):normalized();
+	end
 	base:tick(step)
 end
 

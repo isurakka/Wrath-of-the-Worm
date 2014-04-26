@@ -35,5 +35,9 @@ function table.tostring( tbl )
 end
 
 function degreeToRadian(degree)
-  return degree * (math.pi / 180);
+  return degree * (math.pi / 180)
+end
+
+function radianToDegree(radian)
+  return radian * (180 / math.pi)
 end

@@ -22,6 +22,20 @@ function vec2:add(other)
 	return newVec
 end
 
+function vec2:sub(other)
+	local newVec = vec2(self.x - other.x, self.y - other.y)
+	return newVec
+end
+
+function vec2:mul(scalar)
+	local newVec = vec2(self.x * scalar, self.y * scalar)
+	return newVec
+end
+
+function vec2:dot(other)
+    return self.x * other.x + self.y * other.y;
+end
+
 function vec2:rotateDegrees(angle)
 	angle = degreeToRadian(angle);
 	return self:rotateRadians(angle);
@@ -41,4 +55,9 @@ end
 
 function vec2:length()
 	return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
+end
+
+function vec2:getRotation()
+    local norm = self:normalized()
+    return radianToDegree(math.atan2(norm.y, norm.x))
 end
