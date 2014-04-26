@@ -54,7 +54,7 @@ function love.load()
 
 	-- set food creation hook
 	playerObj.base.onPointAdd = function(point)
-		groundObj:addPoint(point, playerObj.base.radius + 2)
+		groundObj:addPoint(point, playerObj.base.radius + 4)
 	end
 end
 

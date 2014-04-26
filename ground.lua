@@ -8,7 +8,7 @@ function ground:init(size)
 	self.botRight = vec2(size.x / 2, size.y)
 	self.emptySpots = { }
 	self.canvas = love.graphics.newCanvas(size.x, size.y)
-	self.maxEmptyLength = 3000
+	self.maxEmptyLength = 5000
 end
 
 function ground:getSize()
@@ -83,9 +83,10 @@ function ground:draw()
 
 	local size = self:getSize()
 
-	local clearMult = 0.5
-	self.canvas:clear(211 * clearMult, 84 * clearMult, 0 * clearMult, 255)
 	love.graphics.setBlendMode('alpha')
+	local clearMult = 1
+	self.canvas:clear(104 * clearMult, 58 * clearMult, 32 * clearMult, 255)
+	
 
 	local darkMul = 0.9
 	love.graphics.setColor(104 * darkMul, 58 * darkMul, 32 * darkMul, 255)
@@ -100,7 +101,11 @@ function ground:draw()
 
 		love.graphics.setLineWidth(v[2] * 2)
 		love.graphics.line(cur.x + size.x / 2, cur.y, nex[1].x + size.x / 2, nex[1].y)
-		love.graphics.circle("fill", v[1].x + size.x / 2, v[1].y, v[2], v[2] / 2)
+	end
+
+	for i,v in ipairs(self.emptySpots) do
+		local cur = v[1]
+		love.graphics.circle("fill", v[1].x + size.x / 2, v[1].y, v[2], v[2] / 1.2)
 	end
 
 	love.graphics.pop()
