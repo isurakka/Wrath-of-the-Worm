@@ -3,9 +3,11 @@ require("utils")
 require("playerworm")
 require("ground")
 require("food")
+require("human")
 
 gameobjs = { }
 foods = { }
+humans = { }
 playerObj = nil
 groundObj = nil
 
@@ -14,6 +16,12 @@ function love.load()
 
 	groundObj = ground(vec2(2000, 400))
 	table.insert(gameobjs, groundObj)
+
+	for i=1, 50 do
+		local humanObj = human(vec2(math.random(-500, 500)), 1000)
+		table.insert(humans, humanObj)
+		table.insert(gameobjs, humanObj)
+	end
 
 	playerObj = playerworm()
 	table.insert(gameobjs, playerObj)
@@ -76,28 +84,51 @@ function love.tick(step)
 		v:tick(step)
 	end
 
-	-- update ground empty spots
-	for k, v in pairs(playerObj.base.pieces) do
-		local contains = false
-		for k2, v2 in pairs(groundObj.emptySpots) do
-			if (v.x == v2.x and v.y == v2.y) then
-				contains = true
-				break
+	-- check if we can eat food
+	for i = tableLength(foods), 1, -1 do
+		local v = foods[i]
+		local head = playerObj.base:getHead()
+		if (head:sub(v.pos):length() < playerObj.base.radius + 8) then
+			table.remove(foods, i)
+			for i2,v2 in ipairs(gameobjs) do
+				if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+					table.remove(gameobjs, i2)
+					break
+				end
 			end
-		end
 
-		if (not contains) then
-			--table.insert(groundObj.emptySpots, { v, playerObj.base.radius })
+			playerObj.base.maxLength = playerObj.base.maxLength + 15
+			playerObj.base.radius = playerObj.base.radius + 0.15
+		end
+	end
+
+	print(playerObj.base.radius)
+
+	-- check if we can eat humans
+	if (playerObj.base.radius >= 12) then
+		for i = tableLength(humans), 1, -1 do
+			local v = humans[i]
+			local head = playerObj.base:getHead()
+			if (head:sub(v.pos):length() < playerObj.base.radius + 12) then
+				table.remove(humans, i)
+				for i2,v2 in ipairs(gameobjs) do
+					if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+						table.remove(gameobjs, i2)
+						break
+					end
+				end
+
+				playerObj.base.maxLength = playerObj.base.maxLength + 30
+				playerObj.base.radius = playerObj.base.radius + 0.2
+			end
 		end
 	end
 
 	-- add more food if necessary
-	while table.getn(foods) < 4 do
+	while tableLength(foods) < 6 do
 		local size = groundObj:getSize()
 		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y)):add(groundObj.topLeft))
 		table.insert(foods, newFood)
 		table.insert(gameobjs, newFood)
 	end
-
-	--print(table.getn(groundObj.emptySpots))
 end

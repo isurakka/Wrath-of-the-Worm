@@ -70,8 +70,9 @@ function ground:draw()
 
 	local size = self:getSize()
 
-	self.canvas:clear(135, 72, 33, 255)
-	--love.graphics.setBlendMode('alpha')
+	local clearMult = 0.5
+	self.canvas:clear(211 * clearMult, 84 * clearMult, 0 * clearMult, 255)
+	love.graphics.setBlendMode('alpha')
 
 	local darkMul = 0.9
 	love.graphics.setColor(104 * darkMul, 58 * darkMul, 32 * darkMul, 255)
@@ -93,5 +94,6 @@ function ground:draw()
 
 	love.graphics.setCanvas()
 
+	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.draw(self.canvas, self.topLeft.x, self.topLeft.y)
 end

@@ -115,7 +115,7 @@ function worm:tick(step)
 end
 
 function worm:draw()
-	love.graphics.setColor(211, 84, 0, 255)
+	love.graphics.setColor(22, 160, 133, 255)
 	love.graphics.setLineWidth(self.radius * 2)
 	love.graphics.setLineStyle("smooth")
 

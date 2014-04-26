@@ -10,5 +10,6 @@ function food:init(pos)
 end
 
 function food:draw()
-	love.graphics.draw(foodImg, self.pos.x, self.pos.y, 0, self.scale * 0.5)
+	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.draw(foodImg, self.pos.x, self.pos.y, 0, self.scale * 0.4, nil, 32 * 0.4 / 2, 32 * 0.4 / 2)
 end
