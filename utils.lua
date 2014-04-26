@@ -41,3 +41,11 @@ end
 function radianToDegree(radian)
   return radian * (180 / math.pi)
 end
+
+function tableLength(tbl)
+  local count = 0
+  for k, v in pairs(tbl) do 
+    count = count + 1 
+  end
+  return count
+end

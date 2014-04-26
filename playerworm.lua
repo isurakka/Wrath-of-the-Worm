@@ -1,16 +1,16 @@
 require("worm")
 
-base = worm()
 playerworm = gameobj()
 
 local oldInit = playerworm.init
 function playerworm:init()
-	base:init()
+	self.base = worm()
+	self.base:init()
 end
 
 function playerworm:tick(step)
 
-	if (not base:isOverGround()) then
+	if (not self.base:isOverGround()) then
 		local rot = 0
 		if (love.keyboard.isDown("left")) then
 			rot = rot - 1
@@ -19,11 +19,11 @@ function playerworm:tick(step)
 			rot = rot + 1
 		end
 
-		base.dir = base.dir:rotateDegrees(rot * base.rotationSpeed * step):normalized();
+		self.base.dir = self.base.dir:rotateDegrees(rot * self.base.rotationSpeed * step):normalized();
 	end
-	base:tick(step)
+	self.base:tick(step)
 end
 
 function playerworm:draw()
-	base:draw()
+	self.base:draw()
 end
