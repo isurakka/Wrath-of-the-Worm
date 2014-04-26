@@ -17,7 +17,20 @@ function ground:getSize()
 end
 
 function ground:addPoint(point, radius)
-	table.insert(self.emptySpots, 1, { point, radius })
+	local last = self.emptySpots[1]
+	local secondLast = self.emptySpots[2]
+
+	local dot
+	if (last ~= nil and secondLast ~= nil) then
+		dot = last[1]:sub(secondLast[1]):normalized():dot(point:sub(last[1]):normalized())
+	end
+
+	if (dot ~= nil and dot >= 0.999) then
+		self.emptySpots[1] = { point, radius }
+	else
+		table.insert(self.emptySpots, 1, { point, radius })
+	end
+
 	self:trimPoints(self:getEmptyLength() - self.maxEmptyLength)
 end
 

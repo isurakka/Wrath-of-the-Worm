@@ -23,7 +23,7 @@ function love.load()
 		table.insert(gameobjs, humanObj)
 	end
 
-	playerObj = playerworm()
+	playerObj = playerworm(vec2(0, 200))
 	table.insert(gameobjs, playerObj)
 
 	playerObj.base.onPointAdd = function(point)
@@ -101,8 +101,6 @@ function love.tick(step)
 			playerObj.base.radius = playerObj.base.radius + 0.15
 		end
 	end
-
-	print(playerObj.base.radius)
 
 	-- check if we can eat humans
 	if (playerObj.base.radius >= 12) then

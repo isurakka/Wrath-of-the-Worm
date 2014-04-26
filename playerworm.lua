@@ -3,9 +3,8 @@ require("worm")
 playerworm = gameobj()
 
 local oldInit = playerworm.init
-function playerworm:init()
-	self.base = worm()
-	self.base:init()
+function playerworm:init(pos)
+	self.base = worm(pos)
 end
 
 function playerworm:tick(step)

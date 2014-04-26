@@ -3,14 +3,16 @@ require("vec2")
 
 worm = gameobj();
 
-function worm:init()
-	self.pieces = { vec2() }
+function worm:init(pos)
+	self.pieces = { }
 	self.dir = vec2(1, 0)
 	self.maxLength = 100
 	self.speed = 160
 	self.radius = 6;
 	self.rotationSpeed = 300
 	self.onPointAdd = nil
+
+	self:addPoint(pos)
 end
 
 function worm:addPoint(point)
@@ -18,7 +20,7 @@ function worm:addPoint(point)
 	local secondLast = self.pieces[2]
 
 	local dot
-	if (not (last == nil or secondLast == nil)) then
+	if (last ~= nil and secondLast ~= nil) then
 		dot = last:sub(secondLast):normalized():dot(point:sub(last):normalized())
 	end
 
