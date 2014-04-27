@@ -6,20 +6,28 @@ require("food")
 require("human")
 require("house")
 
-gameobjs = { }
-foods = { }
-humans = { }
-houses = { }
-playerObj = nil
-groundObj = nil
+startImg = love.graphics.newImage("start.png")
 endImg = love.graphics.newImage("end.png")
-
-gameState = "game"
 
 function love.load()
 	math.randomseed(os.time())
 
 	love.graphics.setBackgroundColor( 84, 145, 183 )
+
+	love.init()
+
+	gameState = "start"
+end
+
+function love.init()
+
+	-- init global variables
+	gameobjs = { }
+	foods = { }
+	humans = { }
+	houses = { }
+	playerObj = nil
+	groundObj = nil
 
 	-- create ground
 	groundObj = ground(vec2(2000, 590))
@@ -64,6 +72,8 @@ function love.load()
 end
 
 function love.draw()
+	love.graphics.push()
+
 	love.graphics.translate(
 		love.graphics.getWidth() / 2, 
 		love.graphics.getHeight() / 2)
@@ -93,12 +103,33 @@ function love.draw()
 		v:draw()
 	end
 
-	if (gameState == "end") then
+	love.graphics.pop()
+
+	if (gameState == "end" or (gameState == "start")) then
+		local topLeft = vec2(
+			0,
+			0)
+
+		love.graphics.setColor(0, 0, 0, 128)
+
+		love.graphics.rectangle("fill", 
+			topLeft.x,
+			topLeft.y, 
+			love.graphics.getWidth(),
+			love.graphics.getHeight())
+
 		love.graphics.setColor(255, 255, 255, 255)
-		love.graphics.draw(
-			endImg, 
-			playerObj.base:getHead().x + -love.graphics.getWidth() / 2, 
-			playerObj.base:getHead().y + -love.graphics.getHeight() / 2)
+		if (gameState == "end") then
+			love.graphics.draw(
+				endImg, 
+				topLeft.x, 
+				topLeft.y)
+		elseif (gameState == "start") then
+			love.graphics.draw(
+				startImg, 
+				topLeft.x, 
+				topLeft.y)
+		end
 	end
 end
 
@@ -116,6 +147,19 @@ function love.update(dt)
 		-- update
 		for k, v in pairs(gameobjs) do
 			v:update(dt)
+		end
+	elseif (gameState == "end") then
+		if (love.keyboard.isDown("escape")) then
+			love.event.quit()
+		end
+
+		if (love.keyboard.isDown("return")) then
+			gameState = "start"
+			love.init()
+		end
+	elseif (gameState == "start") then
+		if (love.keyboard.isDown("left") or love.keyboard.isDown("right")) then
+			gameState = "game"
 		end
 	end
 end
@@ -215,5 +259,4 @@ end
 
 function love.endGame()
 	gameState = "end"
-	print("died", math.random(0, 100))
 end
