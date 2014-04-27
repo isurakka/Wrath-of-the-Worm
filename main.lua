@@ -8,14 +8,16 @@ require("car")
 require("smallHouse")
 require("house")
 
-startImg = love.graphics.newImage("start.png")
-endImg = love.graphics.newImage("end.png")
+startImg = love.graphics.newImage("assets/start.png")
+endImg = love.graphics.newImage("assets/end.png")
+scoreFont = love.graphics.newFont(64)
 
 function love.load()
 	math.randomseed(os.time())
 
 	love.graphics.setBackgroundColor( 84, 145, 183 )
 
+	love.graphics.setFont(scoreFont)
 	love.init()
 
 	gameState = "start"
@@ -157,6 +159,7 @@ function love.draw()
 				endImg, 
 				topLeft.x, 
 				topLeft.y)
+			love.graphics.print("Score  " .. math.ceil(math.pow(playerObj.base.radius, 1.02) * playerObj.base.maxLength), 50, 280)
 		elseif (gameState == "start") then
 			love.graphics.draw(
 				startImg, 

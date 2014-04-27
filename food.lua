@@ -2,7 +2,7 @@ require("gameobj")
 require("vec2")
 
 food = gameobj();
-foodImg = love.graphics.newImage("bug.png")
+foodImg = love.graphics.newImage("assets/bug.png")
 
 function food:init(pos, size)
 	self.pos = pos
