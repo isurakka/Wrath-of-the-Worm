@@ -5,6 +5,7 @@ require("ground")
 require("food")
 require("human")
 require("car")
+require("smallHouse")
 require("house")
 
 startImg = love.graphics.newImage("start.png")
@@ -27,6 +28,7 @@ function love.init()
 	foods = { }
 	humans = { }
 	cars = { }
+	smallHouses = { }
 	houses = { }
 	playerObj = nil
 	groundObj = nil
@@ -56,15 +58,37 @@ function love.init()
 		end
 	end
 
+	-- generate small houses
+	local houseGen = vec2(-900, 0)
+	while true do
+		local houseSize = vec2(
+			math.random(60, 100),
+			math.random(60, 100))
+		local margin = math.random(1, 3)
+		local smallHouseObj = smallHouse(
+			vec2(houseGen.x + houseSize.x / 2, 0), 
+			vec2(houseSize.x, houseSize.y))
+
+		table.insert(smallHouses, smallHouseObj)
+		table.insert(gameobjs, smallHouseObj)
+
+		houseGen.x = houseGen.x + houseSize.x + margin * 20
+
+		if (houseGen.x > 750) then
+			break
+		end
+	end
+
+
 	-- generate humans
-	for i=1, 30 do
+	for i=1, 40 do
 		local humanObj = human(vec2(math.random(-500, 500)), 1000)
 		table.insert(humans, humanObj)
 		table.insert(gameobjs, humanObj)
 	end
 
 	-- generate cars
-	for i=1, 10 do
+	for i=1, 15 do
 		local carObj = car(vec2(math.random(-500, 500)), 1000)
 		table.insert(cars, carObj)
 		table.insert(gameobjs, carObj)
@@ -183,7 +207,7 @@ function love.tick(step)
 	-- check if we can eat food
 	for i = tableLength(foods), 1, -1 do
 		local v = foods[i]
-		if (head:sub(v.pos):length() < playerObj.base.radius + 8) then
+		if (head:sub(v.pos):length() < playerObj.base.radius + v.size / 2) then
 			table.remove(foods, i)
 			for i2,v2 in ipairs(gameobjs) do
 				if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
@@ -192,9 +216,9 @@ function love.tick(step)
 				end
 			end
 
-			playerObj.base.maxLength = playerObj.base.maxLength + 15
-			playerObj.base.radius = playerObj.base.radius + 0.15
-			playerObj.base.speed = playerObj.base.speed + 1.5
+			playerObj.base.maxLength = playerObj.base.maxLength + 15 * (v.size / v.defaultSize)
+			playerObj.base.radius = playerObj.base.radius + 0.18 * (v.size / v.defaultSize)
+			playerObj.base.speed = playerObj.base.speed + 1.8 * (v.size / v.defaultSize)
 		end
 	end
 
@@ -211,9 +235,9 @@ function love.tick(step)
 					end
 				end
 
-				playerObj.base.maxLength = playerObj.base.maxLength + 30
-				playerObj.base.radius = playerObj.base.radius + 0.2
-				playerObj.base.speed = playerObj.base.speed + 2
+				playerObj.base.maxLength = playerObj.base.maxLength + 25
+				playerObj.base.radius = playerObj.base.radius + 0.22
+				playerObj.base.speed = playerObj.base.speed + 2.2
 			end
 		end
 	end
@@ -231,9 +255,29 @@ function love.tick(step)
 					end
 				end
 
-				playerObj.base.maxLength = playerObj.base.maxLength + 60
+				playerObj.base.maxLength = playerObj.base.maxLength + 55
 				playerObj.base.radius = playerObj.base.radius + 0.4
 				playerObj.base.speed = playerObj.base.speed + 4
+			end
+		end
+	end
+
+	-- check if we can eat small houses
+	if (playerObj.base.radius >= 40) then
+		for i = tableLength(smallHouses), 1, -1 do
+			local v = smallHouses[i]
+			if (head:sub(v.pos:sub(vec2(0, 30))):length() < playerObj.base.radius + 40) then
+				table.remove(smallHouses, i)
+				for i2,v2 in ipairs(gameobjs) do
+					if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+						table.remove(gameobjs, i2)
+						break
+					end
+				end
+
+				playerObj.base.maxLength = playerObj.base.maxLength + 90
+				playerObj.base.radius = playerObj.base.radius + 0.8
+				playerObj.base.speed = playerObj.base.speed + 8
 			end
 		end
 	end
@@ -241,7 +285,7 @@ function love.tick(step)
 	-- add more food if necessary
 	while tableLength(foods) < 6 do
 		local size = groundObj:getSize()
-		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y)):add(groundObj.topLeft))
+		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y)):add(groundObj.topLeft), math.random(12, math.max(12, playerObj.base.radius * 1.5)))
 		table.insert(foods, newFood)
 		table.insert(gameobjs, newFood)
 	end
