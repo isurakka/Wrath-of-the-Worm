@@ -8,6 +8,13 @@ require("car")
 require("smallHouse")
 require("house")
 
+digSource = love.audio.newSource("assets/dig.wav", "static")
+digSource:setLooping(true)
+
+eatSource = love.audio.newSource("assets/eat.wav", "static")
+
+dieSource = love.audio.newSource("assets/die.wav", "static")
+
 startImg = love.graphics.newImage("assets/start.png")
 endImg = love.graphics.newImage("assets/end.png")
 scoreFont = love.graphics.newFont(64)
@@ -122,16 +129,16 @@ function love.draw()
 		topLeft.x + love.graphics.getWidth(),
 		topLeft.y + love.graphics.getHeight())
 
-	if (topLeft.x < groundObj.topLeft.x) then
-		love.graphics.translate(topLeft.x - groundObj.topLeft.x, 0)
+	if (topLeft.x < groundObj.topLeftAll.x) then
+		love.graphics.translate(topLeft.x - groundObj.topLeftAll.x, 0)
 	end
 
-	if (botRight.x > groundObj.botRight.x) then
-		love.graphics.translate(botRight.x - groundObj.botRight.x, 0)
+	if (botRight.x > groundObj.botRightAll.x) then
+		love.graphics.translate(botRight.x - groundObj.botRightAll.x, 0)
 	end
 
-	if (botRight.y > groundObj.botRight.y) then
-		love.graphics.translate(0, botRight.y - groundObj.botRight.y)
+	if (botRight.y > groundObj.botRightAll.y) then
+		love.graphics.translate(0, botRight.y - groundObj.botRightAll.y)
 	end
 
     for k, v in pairs(gameobjs) do
@@ -159,7 +166,10 @@ function love.draw()
 				endImg, 
 				topLeft.x, 
 				topLeft.y)
+
+			love.graphics.setColor(243, 156, 18)
 			love.graphics.print("Score  " .. math.ceil(math.pow(playerObj.base.radius, 1.02) * playerObj.base.maxLength), 50, 280)
+			love.graphics.setColor(255, 255, 255, 255)
 		elseif (gameState == "start") then
 			love.graphics.draw(
 				startImg, 
@@ -207,6 +217,12 @@ function love.tick(step)
 
 	local head = playerObj.base:getHead()
 
+	if (playerObj.base:isOverGround()) then
+		digSource:stop()
+	else
+		digSource:play()
+	end
+
 	-- check if we can eat food
 	for i = tableLength(foods), 1, -1 do
 		local v = foods[i]
@@ -222,6 +238,7 @@ function love.tick(step)
 			playerObj.base.maxLength = playerObj.base.maxLength + 15 * (v.size / v.defaultSize)
 			playerObj.base.radius = playerObj.base.radius + 0.18 * (v.size / v.defaultSize)
 			playerObj.base.speed = playerObj.base.speed + 1.8 * (v.size / v.defaultSize)
+			eatSource:play()
 		end
 	end
 
@@ -241,6 +258,7 @@ function love.tick(step)
 				playerObj.base.maxLength = playerObj.base.maxLength + 25
 				playerObj.base.radius = playerObj.base.radius + 0.22
 				playerObj.base.speed = playerObj.base.speed + 2.2
+				eatSource:play()
 			end
 		end
 	end
@@ -261,34 +279,53 @@ function love.tick(step)
 				playerObj.base.maxLength = playerObj.base.maxLength + 55
 				playerObj.base.radius = playerObj.base.radius + 0.4
 				playerObj.base.speed = playerObj.base.speed + 4
+				eatSource:play()
 			end
 		end
 	end
 
 	-- check if we can eat small houses
-	if (playerObj.base.radius >= 40) then
-		for i = tableLength(smallHouses), 1, -1 do
-			local v = smallHouses[i]
-			if (head:sub(v.pos:sub(vec2(0, 30))):length() < playerObj.base.radius + 40) then
-				table.remove(smallHouses, i)
-				for i2,v2 in ipairs(gameobjs) do
-					if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
-						table.remove(gameobjs, i2)
-						break
-					end
+	for i = tableLength(smallHouses), 1, -1 do
+		local v = smallHouses[i]
+		if (math.min(v.size.x, v.size.y) / 2 <= playerObj.base.radius and head:sub(v.pos:sub(vec2(0, 30))):length() < playerObj.base.radius + 40) then
+			table.remove(smallHouses, i)
+			for i2,v2 in ipairs(gameobjs) do
+				if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+					table.remove(gameobjs, i2)
+					break
 				end
-
-				playerObj.base.maxLength = playerObj.base.maxLength + 90
-				playerObj.base.radius = playerObj.base.radius + 0.8
-				playerObj.base.speed = playerObj.base.speed + 8
 			end
+
+			playerObj.base.maxLength = playerObj.base.maxLength + 90
+			playerObj.base.radius = playerObj.base.radius + 0.8
+			playerObj.base.speed = playerObj.base.speed + 8
+			eatSource:play()
+		end
+	end
+
+	-- check if we can eat houses
+	for i = tableLength(houses), 1, -1 do
+		local v = houses[i]
+		if (v.size.x / 2 <= playerObj.base.radius and head:sub(v.pos:sub(vec2(0, 40))):length() < playerObj.base.radius + 40) then
+			table.remove(houses, i)
+			for i2,v2 in ipairs(gameobjs) do
+				if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+					table.remove(gameobjs, i2)
+					break
+				end
+			end
+
+			playerObj.base.maxLength = playerObj.base.maxLength + 90
+			playerObj.base.radius = playerObj.base.radius + 0.8
+			playerObj.base.speed = playerObj.base.speed + 8
+			eatSource:play()
 		end
 	end
 
 	-- add more food if necessary
 	while tableLength(foods) < 6 do
 		local size = groundObj:getSize()
-		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y)):add(groundObj.topLeft), math.random(12, math.max(12, playerObj.base.radius * 1.5)))
+		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y - 30)):add(groundObj.topLeft), math.random(12, math.max(12, playerObj.base.radius * 1.5)))
 		table.insert(foods, newFood)
 		table.insert(gameobjs, newFood)
 	end
@@ -321,20 +358,26 @@ function love.tick(step)
 
 			if (toHeadDist < playerObj.base.radius * 2) then
 				love.endGame()
-				print("player", head.x, head.y, "test", test.x, test.y)
-				print("lenTested", lenTested, "i", i)
 				goto breakAll
 			end
 			::innerContinue::
 		end
-
-		::continue::
 	end
 	::breakAll::
+
+	-- check if we went outside map
+	if (head.x < groundObj.topLeftAll.x + playerObj.base.radius or
+		head.x > groundObj.botRightAll.x - playerObj.base.radius or
+		head.y > groundObj.botRightAll.y - 30 - playerObj.base.radius) then
+		love.endGame()
+	end
 
 	print("WormRadius", playerObj.base.radius)
 end
 
 function love.endGame()
 	gameState = "end"
+
+	digSource:stop()
+	dieSource:play()
 end
