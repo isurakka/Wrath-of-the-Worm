@@ -5,7 +5,7 @@ require("ground")
 require("food")
 require("human")
 require("car")
-require("smallHouse")
+require("smallhouse")
 require("house")
 
 digSource = love.audio.newSource("assets/dig.wav", "static")
@@ -90,7 +90,7 @@ function love.init()
 
 
 	-- generate humans
-	for i=1, 40 do
+	for i=1, 20 do
 		local humanObj = human(vec2(math.random(-500, 500)), 1000)
 		table.insert(humans, humanObj)
 		table.insert(gameobjs, humanObj)
@@ -236,8 +236,8 @@ function love.tick(step)
 			end
 
 			playerObj.base.maxLength = playerObj.base.maxLength + 15 * (v.size / v.defaultSize)
-			playerObj.base.radius = playerObj.base.radius + 0.18 * (v.size / v.defaultSize)
-			playerObj.base.speed = playerObj.base.speed + 1.8 * (v.size / v.defaultSize)
+			playerObj.base.radius = playerObj.base.radius + 0.2 * (v.size / v.defaultSize)
+			playerObj.base.speed = playerObj.base.speed + 2 * (v.size / v.defaultSize)
 			eatSource:play()
 		end
 	end
@@ -256,8 +256,8 @@ function love.tick(step)
 				end
 
 				playerObj.base.maxLength = playerObj.base.maxLength + 25
-				playerObj.base.radius = playerObj.base.radius + 0.22
-				playerObj.base.speed = playerObj.base.speed + 2.2
+				playerObj.base.radius = playerObj.base.radius + 0.3
+				playerObj.base.speed = playerObj.base.speed + 3
 				eatSource:play()
 			end
 		end
@@ -276,17 +276,28 @@ function love.tick(step)
 					end
 				end
 
-				playerObj.base.maxLength = playerObj.base.maxLength + 55
-				playerObj.base.radius = playerObj.base.radius + 0.4
-				playerObj.base.speed = playerObj.base.speed + 4
+				playerObj.base.maxLength = playerObj.base.maxLength + 50
+				playerObj.base.radius = playerObj.base.radius + 0.6
+				playerObj.base.speed = playerObj.base.speed + 6
 				eatSource:play()
 			end
 		end
 	end
 
+	local addedHuman = false
+
 	-- check if we can eat small houses
 	for i = tableLength(smallHouses), 1, -1 do
 		local v = smallHouses[i]
+
+		if (addedHuman == false and v.humans > 0 and math.random(1, 7000) == 1) then
+			local humanObj = human(vec2(v.pos.x), 1000)
+			table.insert(humans, humanObj)
+			table.insert(gameobjs, humanObj)
+			addedHuman = true
+			v.humans = v.humans - 1
+		end
+
 		if (math.min(v.size.x, v.size.y) / 2 <= playerObj.base.radius and head:sub(v.pos:sub(vec2(0, 30))):length() < playerObj.base.radius + 40) then
 			table.remove(smallHouses, i)
 			for i2,v2 in ipairs(gameobjs) do
@@ -297,8 +308,8 @@ function love.tick(step)
 			end
 
 			playerObj.base.maxLength = playerObj.base.maxLength + 90
-			playerObj.base.radius = playerObj.base.radius + 0.8
-			playerObj.base.speed = playerObj.base.speed + 8
+			playerObj.base.radius = playerObj.base.radius + 1.2
+			playerObj.base.speed = playerObj.base.speed + 12
 			eatSource:play()
 		end
 	end
@@ -306,6 +317,15 @@ function love.tick(step)
 	-- check if we can eat houses
 	for i = tableLength(houses), 1, -1 do
 		local v = houses[i]
+
+		if (addedHuman == false and v.humans > 0 and math.random(1, 7000) == 1) then
+			local humanObj = human(vec2(v.pos.x), 1000)
+			table.insert(humans, humanObj)
+			table.insert(gameobjs, humanObj)
+			addedHuman = true
+			v.humans = v.humans - 1
+		end
+
 		if (v.size.x / 2 <= playerObj.base.radius and head:sub(v.pos:sub(vec2(0, 40))):length() < playerObj.base.radius + 40) then
 			table.remove(houses, i)
 			for i2,v2 in ipairs(gameobjs) do
@@ -315,17 +335,19 @@ function love.tick(step)
 				end
 			end
 
-			playerObj.base.maxLength = playerObj.base.maxLength + 90
-			playerObj.base.radius = playerObj.base.radius + 0.8
-			playerObj.base.speed = playerObj.base.speed + 8
+			playerObj.base.maxLength = playerObj.base.maxLength + 160
+			playerObj.base.radius = playerObj.base.radius + 2.4
+			playerObj.base.speed = playerObj.base.speed + 24
 			eatSource:play()
 		end
 	end
 
+	print("humans", tableLength(humans))
+
 	-- add more food if necessary
 	while tableLength(foods) < 6 do
 		local size = groundObj:getSize()
-		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y - 30)):add(groundObj.topLeft), math.random(12, math.max(12, playerObj.base.radius * 1.5)))
+		local newFood = food(vec2(math.random(0, size.x), math.random(0, size.y - 60)):add(groundObj.topLeft), math.random(12, math.max(12, playerObj.base.radius * 1.5)))
 		table.insert(foods, newFood)
 		table.insert(gameobjs, newFood)
 	end

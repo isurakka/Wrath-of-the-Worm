@@ -15,6 +15,7 @@ function smallHouse:init(pos, size)
 	self.size = size
 	self.color = bodyColors[math.random(1, tableLength(bodyColors))]
 	self.colorMult = math.random(50, 80) / 100
+	self.humans = size.x / 10
 end
 
 function smallHouse:draw()

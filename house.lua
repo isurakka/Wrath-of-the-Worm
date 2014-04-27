@@ -7,6 +7,7 @@ function house:init(pos, size)
 	self.pos = pos
 	self.size = size
 	self.colorMult = math.random(70, 100) / 100
+	self.humans = size.x / 10
 end
 
 function house:draw()
