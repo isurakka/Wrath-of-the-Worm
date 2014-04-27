@@ -6,9 +6,10 @@ ground = gameobj();
 function ground:init(size)
 	self.topLeft = vec2(-size.x / 2, 0)
 	self.botRight = vec2(size.x / 2, size.y)
+	self.beachWidth = size.x / 4
 	self.emptySpots = { }
 	self.canvas = love.graphics.newCanvas(size.x, size.y)
-	self.maxEmptyLength = 5000
+	self.maxEmptyLength = 8000
 end
 
 function ground:getSize()
