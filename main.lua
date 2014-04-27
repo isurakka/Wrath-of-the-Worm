@@ -4,6 +4,7 @@ require("playerworm")
 require("ground")
 require("food")
 require("human")
+require("car")
 require("house")
 
 startImg = love.graphics.newImage("start.png")
@@ -25,6 +26,7 @@ function love.init()
 	gameobjs = { }
 	foods = { }
 	humans = { }
+	cars = { }
 	houses = { }
 	playerObj = nil
 	groundObj = nil
@@ -55,10 +57,17 @@ function love.init()
 	end
 
 	-- generate humans
-	for i=1, 40 do
+	for i=1, 30 do
 		local humanObj = human(vec2(math.random(-500, 500)), 1000)
 		table.insert(humans, humanObj)
 		table.insert(gameobjs, humanObj)
+	end
+
+	-- generate cars
+	for i=1, 10 do
+		local carObj = car(vec2(math.random(-500, 500)), 1000)
+		table.insert(cars, carObj)
+		table.insert(gameobjs, carObj)
 	end
 
 	-- create player
@@ -209,6 +218,26 @@ function love.tick(step)
 		end
 	end
 
+	-- check if we can eat cars
+	if (playerObj.base.radius >= 20) then
+		for i = tableLength(cars), 1, -1 do
+			local v = cars[i]
+			if (head:sub(v.pos:sub(vec2(0, 20))):length() < playerObj.base.radius + 20) then
+				table.remove(cars, i)
+				for i2,v2 in ipairs(gameobjs) do
+					if (v2.pos ~= nil and v2.pos.x == v.pos.x and v2.pos.y == v.pos.y) then
+						table.remove(gameobjs, i2)
+						break
+					end
+				end
+
+				playerObj.base.maxLength = playerObj.base.maxLength + 60
+				playerObj.base.radius = playerObj.base.radius + 0.4
+				playerObj.base.speed = playerObj.base.speed + 4
+			end
+		end
+	end
+
 	-- add more food if necessary
 	while tableLength(foods) < 6 do
 		local size = groundObj:getSize()
@@ -255,6 +284,8 @@ function love.tick(step)
 		::continue::
 	end
 	::breakAll::
+
+	print("WormRadius", playerObj.base.radius)
 end
 
 function love.endGame()
